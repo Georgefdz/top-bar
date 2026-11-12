@@ -18,10 +18,28 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         triggers.start()
         manager.start()
+        listenForCommands()
 
         if !Permissions.isTrusted {
             Permissions.request()
             showSettings()
+        }
+    }
+
+    /// Lets scripts (Scripts/e2e.sh) drive the bar: post `dev.topbar.command` with collapse|expand|showAll.
+    private func listenForCommands() {
+        DistributedNotificationCenter.default().addObserver(
+            forName: .init("dev.topbar.command"), object: nil, queue: .main
+        ) { [weak self] note in
+            let command = note.object as? String
+            MainActor.assumeIsolated {
+                switch command {
+                case "collapse": self?.manager.collapse()
+                case "expand": self?.manager.reveal(.expanded)
+                case "showAll": self?.manager.reveal(.showAll)
+                default: Log.reconcile.error("unknown command \(command ?? "nil", privacy: .public)")
+                }
+            }
         }
     }
 

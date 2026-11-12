@@ -11,6 +11,8 @@ final class ControlItems: NSObject {
 
     var onClick: ((_ withOption: Bool) -> Void)?
     var onOpenSettings: (() -> Void)?
+    /// Shown at the top of the right-click menu when hiding is broken.
+    var warning: String?
     private(set) var state: State = .collapsed
 
     /// False when the system hides items for us (macOS 27 native visibility).
@@ -92,6 +94,10 @@ final class ControlItems: NSObject {
 
     private func showMenu() {
         let menu = NSMenu()
+        if let warning {
+            menu.addItem(withTitle: "⚠︎ \(warning)", action: nil, keyEquivalent: "")
+            menu.addItem(.separator())
+        }
         menu.addItem(withTitle: "Settings…", action: #selector(openSettings), keyEquivalent: ",").target = self
         menu.addItem(.separator())
         menu.addItem(withTitle: "Quit TopBar", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")

@@ -7,6 +7,7 @@ let package = Package(
     targets: [
         .target(name: "MenuBarClientShim", path: "Sources/MenuBarClientShim"),
         .executableTarget(name: "TopBar", dependencies: ["MenuBarClientShim"], path: "Sources/TopBar"),
+        .executableTarget(name: "TopBarFixture", path: "Sources/TopBarFixture"), // e2e test app
         .testTarget(name: "TopBarTests", dependencies: ["TopBar"], path: "Tests/TopBarTests"),
     ]
 )

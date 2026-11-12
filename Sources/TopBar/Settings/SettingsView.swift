@@ -23,6 +23,12 @@ struct SettingsView: View {
                 }
             }
 
+            if let error = manager.nativeError {
+                Section {
+                    Label(error, systemImage: "exclamationmark.triangle").foregroundStyle(.red)
+                }
+            }
+
             Section("Menu bar items") {
                 let rows = AppRow.rows(items: manager.items, saved: Array(settings.sections.keys))
                 if rows.isEmpty {

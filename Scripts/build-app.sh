@@ -3,6 +3,8 @@
 # Accessibility grant survives rebuilds (ad-hoc "-" signatures change every build).
 set -euo pipefail
 cd "$(dirname "$0")/.."
+# A free self-signed "TopBar Dev" code-signing cert (Keychain Access) keeps the grant across rebuilds.
+security find-identity -v -p codesigning | grep -q '"TopBar Dev"' && : "${SIGN_IDENTITY:=TopBar Dev}"
 swift build -c release
 APP=build/TopBar.app
 rm -rf "$APP"

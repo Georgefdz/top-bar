@@ -9,6 +9,10 @@ import Observation
 final class MenuBarManager {
     private(set) var items: [MenuBarItem] = []
     private(set) var isBusy = false
+    /// Set when macOS 27 hiding is broken (private API missing or refused), so the user isn't left guessing.
+    private(set) var nativeError: String? {
+        didSet { controls.warning = nativeError }
+    }
 
     @ObservationIgnored private let controls: ControlItems
     @ObservationIgnored private let settings: SettingsStore
@@ -24,6 +28,11 @@ final class MenuBarManager {
         controls.usesSeparators = native == nil
         controls.onClick = { [weak self] withOption in self?.iconClicked(withOption: withOption) }
         Log.reconcile.notice("native visibility: \(self.native != nil)")
+        native?.onResult = { [weak self] in self?.nativeError = $0.map { "Hiding failed: \($0)" } }
+        if native == nil, ProcessInfo.processInfo.isOperatingSystemAtLeast(.init(majorVersion: 27, minorVersion: 0, patchVersion: 0)) {
+            nativeError = "Hiding is unavailable: this macOS changed the private menu bar API TopBar relies on."
+            controls.warning = nativeError // didSet doesn't run in init
+        }
     }
 
     func start() {
@@ -156,7 +165,6 @@ final class MenuBarManager {
         }
     }
 
-    // shortcut: rehides even if a hidden item's menu is open; detect open menus if that bites.
     private func scheduleRehide() {
         rehideTask?.cancel()
         guard settings.autoRehide else { return }
@@ -164,7 +172,7 @@ final class MenuBarManager {
             while let self, !Task.isCancelled {
                 try? await Task.sleep(for: .seconds(self.settings.rehideDelay))
                 guard !Task.isCancelled else { return }
-                if !MenuBarGeometry.mouseIsInMenuBar() {
+                if !MenuBarGeometry.mouseIsInMenuBar(), !MenuBarGeometry.menuIsOpen() {
                     self.setState(.collapsed)
                     return
                 }

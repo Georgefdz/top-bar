@@ -10,6 +10,9 @@ final class NativeVisibility {
     /// Keep every system item (clock, Control Center, ...); only apps are filtered.
     private static let systemItems = (0..<64).map { NSNumber(value: $0) }
 
+    /// Called with an error message when activation fails, nil when it succeeds.
+    var onResult: ((String?) -> Void)?
+
     private var assertion: Any?
     private var generation = 0 // drops completions from requests that were superseded
 
@@ -29,12 +32,14 @@ final class NativeVisibility {
                 }
                 if let error {
                     Log.reconcile.error("native visibility failed: \(error.localizedDescription, privacy: .public)")
+                    self.onResult?(error.localizedDescription)
                     return
                 }
                 // Activate the new restriction before dropping the old one, so icons don't flash.
                 let old = self.assertion
                 self.assertion = newAssertion
                 if let old { TBVisibilityInvalidate(old) }
+                self.onResult?(nil)
             }
         }
     }

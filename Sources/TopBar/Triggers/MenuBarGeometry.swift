@@ -20,4 +20,11 @@ enum MenuBarGeometry {
                                menuBarHeight: height > 0 ? height : NSStatusBar.system.thickness)
         }
     }
+
+    /// True while any app shows a menu (a status item's menu included). Needs no permissions.
+    static func menuIsOpen() -> Bool {
+        let menuLevel = Int(CGWindowLevelForKey(.popUpMenuWindow))
+        let windows = CGWindowListCopyWindowInfo(.optionOnScreenOnly, kCGNullWindowID) as? [[String: Any]] ?? []
+        return windows.contains { $0[kCGWindowLayer as String] as? Int == menuLevel }
+    }
 }
