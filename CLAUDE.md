@@ -8,7 +8,7 @@ Full plan and roadmap: `~/.claude/plans/hey-okay-so-we-tender-torvalds.md`
 - `swift build` / `swift test`: SwiftPM, no Xcode project. Open `Package.swift` in Xcode if you want the IDE.
 - `Scripts/build-app.sh && open /Applications/TopBar.app`: wraps the binary into a `.app` with `Resources/Info.plist` (LSUIElement, so no Dock icon), ad-hoc codesigns it, quits the running copy, and installs it to `/Applications`. A real `.app` is required for Accessibility and launch at login.
 - **Always run the `/Applications` copy.** On macOS 27, a restricted menu bar hides TopBar's own chevron when the app runs from `build/` (even with `lsregister`, and even though its bundle ID is on the allow-list). The user is then left with no icon to click.
-- Logs: `log show --last 5m --info --predicate 'subsystem == "dev.topbar.TopBar"'`
+- Logs: `/usr/bin/log show --last 5m --info --predicate 'subsystem == "dev.topbar.TopBar"'`
 - Saved settings: `defaults read dev.topbar.TopBar`
 - Toolchain: macOS 27, Xcode 16.2, Swift 6.0.3, but the package uses tools-version 5.10 (Swift 5 language mode). Minimum target is macOS 14.
 
