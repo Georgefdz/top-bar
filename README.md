@@ -31,7 +31,7 @@ I built this because of OBS. Every time I recorded, its icon sat in my menu bar 
 There's no prebuilt download yet, so you build it yourself. It takes about a minute:
 
 ```sh
-git clone https://github.com/<your-username>/top-bar.git
+git clone https://github.com/Georgefdz/top-bar.git
 cd top-bar
 Scripts/build-app.sh
 open /Applications/TopBar.app
